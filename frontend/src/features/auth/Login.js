@@ -1,35 +1,59 @@
 import React, { useState } from 'react';
-import { loginUser } from '../../services/api';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login() {
+const Login = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  async function handleSubmit(e) {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const data = await loginUser(email, password);
-      alert('Login successful! Token: ' + data.token);
-      // TODO: Save token, redirect user
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password,
+      });
+
+      localStorage.setItem('token', res.data.token);
+      alert('Login successful');
+      navigate('/'); // redirect to home or dashboard
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      setError('Login failed');
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 300 }}>
+    <div>
       <h2>Login</h2>
-      {error && <p style={{color:'red'}}>{error}</p>}
-      <div>
-        <label>Email:</label><br />
-        <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-      </div>
-      <div>
-        <label>Password:</label><br />
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-      </div>
-      <button type="submit" style={{ marginTop: 10 }}>Login</button>
-    </form>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        /><br />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        /><br />
+
+        <button type="submit">Login</button>
+      </form>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
   );
-}
+};
+
+export default Login;

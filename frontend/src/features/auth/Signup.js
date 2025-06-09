@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { signupUser } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -14,9 +16,9 @@ export default function Signup() {
       return;
     }
     try {
-      const data = await signupUser(email, password);
+      await signupUser(email, password);  // removed 'data' since unused
       alert('Signup successful! You can now login.');
-      // TODO: redirect to login page
+      navigate('/login');  // redirect to login page
     } catch (err) {
       setError(err.message);
     }
@@ -25,7 +27,7 @@ export default function Signup() {
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 300 }}>
       <h2>Signup</h2>
-      {error && <p style={{color:'red'}}>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <div>
         <label>Email:</label><br />
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
