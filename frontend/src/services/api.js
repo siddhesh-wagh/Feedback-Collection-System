@@ -6,8 +6,13 @@ export async function loginUser(email, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error('Login failed');
-  return res.json(); // Should return token/user data
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Login failed');
+  }
+
+  return res.json(); // returns token/user data
 }
 
 export async function signupUser(email, password) {
@@ -16,6 +21,26 @@ export async function signupUser(email, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
-  if (!res.ok) throw new Error('Signup failed');
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Signup failed');
+  }
+
+  return res.json();
+}
+
+export async function saveForm(formData) {
+  const res = await fetch(`${API_BASE}/api/forms`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Failed to save form');
+  }
+
   return res.json();
 }
